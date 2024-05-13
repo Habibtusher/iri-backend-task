@@ -12,10 +12,14 @@ import { DatabaseService } from 'src/database/database.service';
 import bcrypt from 'bcrypt';
 import { createToken, verifyToken } from 'src/helpers/token';
 import { LoginDto } from './users.dto';
+import { RedisService } from 'nestjs-redis';
 
 @Injectable()
 export class UsersService {
-  constructor(private database: DatabaseService) {}
+  constructor(
+    private database: DatabaseService,
+    private redisService: RedisService,
+  ) {}
   async getAllUsers() {
     return this.database.user.findMany({});
   }
@@ -85,6 +89,8 @@ export class UsersService {
         process.env.JWT_SECRET,
         process.env.JWT_EXPIRES_IN,
       );
+      const redisClient = this.redisService.getClient();
+      await redisClient.set(newAccessToken, JSON.stringify(user), 'EX', 300);
       return {
         access_token: newAccessToken,
         user: {
