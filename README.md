@@ -14,3 +14,4 @@ $ yarn dev
 $ yarn prod
 ```
 # iri-backend-task
+Create User: [text](http://localhost:3000/api/v1/users)
